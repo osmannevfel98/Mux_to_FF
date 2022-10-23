@@ -1,0 +1,90 @@
+
+module Reg8bit(Clk, Sel , RnW, Dio);
+input Clk, Sel, RnW;
+inout [7:0] Dio;
+
+reg [7:0] FFstore;
+
+always@(posedge Clk)
+begin
+	if( Sel == 1'b1)
+	begin
+		if(RnW == 1'b0)
+			FFstore[7:0] <= Dio[7:0];					
+	end
+	else
+		FFstore[7:0] <= FFstore[7:0];
+end		
+
+assign Dio = (Sel == 1'b1 && RnW == 1'b1) ? FFstore : 1'bZ;
+
+endmodule 
+
+
+
+module Accumulator(Clk, Sel , RnW, Dio);
+input Clk, Sel, RnW;
+inout [7:0] Dio;
+
+reg ResetEn;
+reg [7:0] FFstore;
+
+always@(posedge Clk)
+begin
+	if( ResetEn == 1'b1)
+	begin
+		if(Sel == 1'b1)
+			FFstore[7:0] <= Dio[7:0];
+		else
+			FFstore[7:0] <= 8'd0;
+	end
+	else if( Sel == 1'b1)
+	begin
+		if(RnW == 1'b0)
+			FFstore[7:0] <= FFstore[7:0] + Dio[7:0];					
+	end
+	else
+		FFstore[7:0] <= FFstore[7:0];
+		
+		
+end
+
+always@(posedge Clk)
+begin
+	if(Sel == 1'b1)
+	begin
+		if(RnW == 1'b1)
+			ResetEn <= 1'b1;
+		else
+			ResetEn <= 1'b0;
+	end
+	else
+		ResetEn <= ResetEn;
+end
+assign Dio = (Sel == 1'b1 && RnW == 1'b1) ? FFstore : 1'bZ;
+
+endmodule 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
